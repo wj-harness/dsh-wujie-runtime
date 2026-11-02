@@ -28,7 +28,7 @@ export type CancellableAgent = QuiescentAgent & Pick<Agent, 'cancel'>
  * {@link settleCancelled}, which stops descendants before converging the root.
  * @param subagents - DSH's subagent service, absent when the profile mounts none.
  * @param agent - the task's root agent.
- * @param signal - aborted when Multica cancels the task.
+ * @param signal - aborted when Wujie cancels the task.
  * @returns `'cancelled'` when the signal aborted, `'settled'` otherwise.
  */
 export async function waitForQuiescence(

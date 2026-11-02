@@ -1,6 +1,6 @@
-# Multica DSH Runtime
+# Wujie DSH Runtime
 
-Private, out-of-tree runtime bridge between Multica and the public
+Public, out-of-tree runtime bridge between Wujie and the public (adapted from multica-ai/dsh-multica-runtime; package id @wujie-agent/dsh-runtime)
 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness). It exposes
 a versioned JSONL protocol over stdio and composes over
 `@deepseek-ai/dsh-base`. It does not require changes to DeepSeek Harness.

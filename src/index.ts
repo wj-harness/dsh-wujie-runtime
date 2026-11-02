@@ -30,10 +30,10 @@ import {
   type OutboundFrame,
   type RuntimeModelFrame,
 } from './protocol.js'
-import { installMulticaTerminalEnvironment } from './environment.js'
+import { installWujieTerminalEnvironment } from './environment.js'
 import { settleCancelled as settleCancelledAgent, waitForQuiescence, type SubagentLifecycle } from './lifecycle.js'
 
-export const name = 'multica-dsh-runtime'
+export const name = 'wujie-dsh-runtime'
 export const inject = ['cmdlineArgs', 'agents', 'agentDefaultModel', 'sessions', 'llm']
 
 const PLUGIN_VERSION = '0.2.0-private.1'
@@ -66,7 +66,7 @@ function writeFrame(frame: OutboundFrame): void {
 }
 
 function writeDiagnostic(message: string): void {
-  process.stderr.write(`multica-dsh-runtime: ${message}\n`)
+  process.stderr.write(`wujie-dsh-runtime: ${message}\n`)
 }
 
 function protocolError(code: string, message: string): void {
@@ -348,7 +348,7 @@ async function createOrResumeAgent(
   const options = { provider: selection.provider, model: selection.model }
   if (active.command.resume_session_id === undefined) {
     const handle = await agents.create({
-      sessionId: SessionId(`multica-${randomUUID()}`),
+      sessionId: SessionId(`wujie-${randomUUID()}`),
       meta: { cwd: active.command.cwd },
       agentOptions: options,
       setup,
@@ -443,13 +443,13 @@ async function execute(ctx: Context, active: ActiveRun): Promise<number> {
 }
 
 async function stdio(ctx: Context): Promise<number> {
-  const forwarding = await installMulticaTerminalEnvironment(ctx)
+  const forwarding = await installWujieTerminalEnvironment(ctx)
   if (forwarding !== undefined && !forwarding.forwarded) {
     // Fail loudly at boot instead of twenty seconds later, as an opaque
     // "requires a task-scoped mat_ token" refusal on the agent's first
-    // `multica` call (MUL-6186).
+    // `wujie` call (MUL-6186).
     writeDiagnostic(
-      'MULTICA_TOKEN is not reaching model-spawned subprocesses; in-task multica commands will be refused',
+      'WUJIE_TOKEN is not reaching model-spawned subprocesses; in-task wujie commands will be refused',
     )
   }
   const activeRef: { current?: ActiveRun; finished: boolean } = { finished: false }

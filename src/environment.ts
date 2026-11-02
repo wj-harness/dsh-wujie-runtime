@@ -3,10 +3,10 @@ import { createRequire } from 'node:module'
 import { pathToFileURL } from 'node:url'
 import type { Context } from '@deepseek-ai/cordis'
 import { SENSITIVE_ENV_PATTERN, scrubbedParentEnv } from '@deepseek-ai/dsh-subprocess'
-import { multicaTerminalEnvironment } from './task-env.js'
+import { wujieTerminalEnvironment } from './task-env.js'
 
-/** The one credential name Multica forwards through DSH's scrub. */
-const TASK_TOKEN_KEY = 'MULTICA_TOKEN'
+/** The one credential name Wujie forwards through DSH's scrub. */
+const TASK_TOKEN_KEY = 'WUJIE_TOKEN'
 
 /** The slice of `@deepseek-ai/dsh-subprocess` this module patches and probes. */
 interface ScrubModule {
@@ -14,7 +14,7 @@ interface ScrubModule {
   scrubbedParentEnv(): Record<string, string>
 }
 
-/** What {@link installMulticaTerminalEnvironment} actually achieved. */
+/** What {@link installWujieTerminalEnvironment} actually achieved. */
 export interface TerminalEnvironmentReport {
   /** How many distinct scrub instances now exempt the task token. */
   patched: number
@@ -24,7 +24,7 @@ export interface TerminalEnvironmentReport {
 
 /**
  * DSH deliberately removes credential-shaped ambient variables from every
- * model-spawned subprocess. Multica's task token is the one narrow exception:
+ * model-spawned subprocess. Wujie's task token is the one narrow exception:
  * its CLI requires the server-minted `mat_` credential to attribute agent
  * reads and writes to the current task. A user PAT or model-provider
  * credential must never pass through this path.
@@ -59,7 +59,7 @@ function exemptTaskToken(pattern: RegExp): () => void {
  * matcher belongs to, and a bridge loaded through a `link:` dependency resolves
  * its own copy of `@deepseek-ai/dsh-subprocess` rather than the copy the DSH
  * launcher loaded. Patching only the statically imported one left the real
- * scrub untouched, the token stripped, and every in-task `multica` command
+ * scrub untouched, the token stripped, and every in-task `wujie` command
  * refused for want of a `mat_` credential (MUL-6186). Nothing about that
  * failure was visible until an agent tried to use the CLI.
  * @param patterns - scrub matchers to exempt; duplicates are patched once.
@@ -104,11 +104,11 @@ async function hostScrubModule(entrypoint: string | undefined): Promise<ScrubMod
  * @param entrypoint - the launcher script to resolve DSH's own copy from.
  * @returns what was installed, or undefined when there is no task token to forward.
  */
-export async function installMulticaTerminalEnvironment(
+export async function installWujieTerminalEnvironment(
   ctx: Context,
   entrypoint: string | undefined = process.argv[1],
 ): Promise<TerminalEnvironmentReport | undefined> {
-  const explicitEnvironment = multicaTerminalEnvironment(process.env)
+  const explicitEnvironment = wujieTerminalEnvironment(process.env)
   if (explicitEnvironment[TASK_TOKEN_KEY] === undefined) return undefined
 
   const host = await hostScrubModule(entrypoint)
@@ -117,7 +117,7 @@ export async function installMulticaTerminalEnvironment(
       ? [SENSITIVE_ENV_PATTERN]
       : [SENSITIVE_ENV_PATTERN, host.SENSITIVE_ENV_PATTERN],
   )
-  ctx.effect(() => dispose, 'multica task environment forwarding')
+  ctx.effect(() => dispose, 'wujie task environment forwarding')
 
   // Probe the scrub the shell tools will really call rather than trusting that
   // the patch landed. A silent miss here costs the whole task.
@@ -125,4 +125,4 @@ export async function installMulticaTerminalEnvironment(
   return { patched, forwarded: scrub()[TASK_TOKEN_KEY] !== undefined }
 }
 
-export { multicaTerminalEnvironment } from './task-env.js'
+export { wujieTerminalEnvironment } from './task-env.js'

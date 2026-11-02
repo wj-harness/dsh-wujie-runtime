@@ -1,11 +1,11 @@
 {
-  "name": "@multica-ai/dsh-runtime",
+  "name": "@wujie-agent/dsh-runtime",
   "version": "0.2.0-private.1",
   "private": true,
-  "description": "Private DeepSeek Harness runtime bridge for Multica",
+  "description": "Wujie runtime bridge for DeepSeek Harness (wujie adaptation of multica-ai/dsh-multica-runtime)",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dsh-external/dsh-multica-runtime.git"
+    "url": "git+https://github.com/wj-harness/dsh-wujie-runtime.git"
   },
   "type": "module",
   "main": "dist/index.js",
